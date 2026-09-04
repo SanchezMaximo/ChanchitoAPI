@@ -1,0 +1,12 @@
+# Artefactos de compilacion de .NET
+[Bb]in/
+[Oo]bj/
+
+# Configuracion local de usuario / IDE
+.vs/
+.vscode/
+.claude/settings.local.json
+*.user
+
+# Secretos locales
+appsettings.*.local.json
