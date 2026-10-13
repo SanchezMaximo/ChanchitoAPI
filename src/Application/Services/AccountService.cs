@@ -1,5 +1,6 @@
 using Domain.Entities;
 using Domain.Interfaces;
+using Domain.Enums;
 
 public class AccountService
 {
@@ -21,5 +22,15 @@ public class AccountService
         accountRepository.SaveChanges();
 
         return transaction;
+    }
+
+    public Account CreateAccount(string name, decimal balance, AccountType type, Currency currency, Guid customerId)
+    {
+        var account = new Account(name, balance, type, currency, customerId);
+
+        accountRepository.Add(account);
+        accountRepository.SaveChanges();
+
+        return account;
     }
 }
