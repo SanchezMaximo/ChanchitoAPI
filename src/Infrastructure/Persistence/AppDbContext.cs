@@ -13,5 +13,14 @@ namespace Infrastructure.Persistence
         public DbSet<Account> Accounts => Set<Account>();
 
         public DbSet<Transaction> Transactions => Set<Transaction>();
+        public DbSet<Customer> Customers => Set<Customer>();
+        public DbSet<User> Users => Set<User>();
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<User>().UseTpcMappingStrategy();
+        }
     }
 }
