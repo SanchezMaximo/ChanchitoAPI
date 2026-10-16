@@ -21,10 +21,10 @@ namespace Application.Services
             if (string.IsNullOrWhiteSpace(request.Password) || request.Password.Length < 8)
                 throw new ArgumentException("La contraseña debe tener al menos 8 caracteres.", nameof(request));
 
-            var customer = new Customer(request.Email, passwordHasher.Hash(request.Password));
-
             if (userRepository.GetByEmail(request.Email) is not null)
                 throw new InvalidOperationException($"Ya existe un usuario con el email {request.Email}.");
+
+            var customer = new Customer(request.Email, passwordHasher.Hash(request.Password));    
 
             userRepository.Add(customer);
             userRepository.SaveChanges();

@@ -16,19 +16,19 @@ namespace Presentation.Controllers
         }
 
         [HttpPost]
-        public ActionResult<CustomerResponse> Create([FromBody] CreateCustomerRequest request)
+        public ActionResult<CustomerResponse> Create([FromBody] CreateCustomerRequest request) //revisar
         {
             try
             {
                 var customer = customerService.Create(request);
 
-                return CreatedAtAction(nameof(GetById), new { id = customer.Id }, customer);
+                return CreatedAtAction(nameof(GetById), new { id = customer.Id }, customer); //explicacion: setea un id y el email y pass?
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException ex) // valida que los datos sean correctos
             {
                 return BadRequest(ex.Message);
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException ex) // valida que no exista un cliente con ese email
             {
                 return Conflict(ex.Message);
             }
