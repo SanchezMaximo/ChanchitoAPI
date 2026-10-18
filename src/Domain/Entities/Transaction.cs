@@ -12,7 +12,6 @@ namespace Domain.Entities
         public DateTime Date { get; private set; }
         public Currency Currency { get; private set; }
         public bool Cancelled { get; private set; }
-
         private Transaction()
         {
         }
@@ -20,22 +19,21 @@ namespace Domain.Entities
         public Transaction(TransactionType type, string description, decimal amount, DateTime date, Currency currency, Guid accountId)
         {
             if (!Enum.IsDefined(type))
-                throw new ArgumentOutOfRangeException(nameof(type), "El tipo de movimiento no es válido.");
+                throw new ArgumentOutOfRangeException(nameof(type), "The transaction type is not valid.");
 
             if (string.IsNullOrWhiteSpace(description))
-                throw new ArgumentException("La descripción es obligatoria.", nameof(description));
+                throw new ArgumentException("The description is required.", nameof(description));
 
-            if (amount <= 0)
-                throw new ArgumentOutOfRangeException(nameof(amount), "El monto debe ser mayor a cero.");
+            ValidateAmount(amount);
 
             if (date > DateTime.UtcNow)
-                throw new ArgumentOutOfRangeException(nameof(date), "La fecha no puede ser futura.");
+                throw new ArgumentOutOfRangeException(nameof(date), "The date cannot be in the future.");
 
             if (!Enum.IsDefined(currency))
-                throw new ArgumentOutOfRangeException(nameof(currency), "La moneda no es válida.");
+                throw new ArgumentOutOfRangeException(nameof(currency), "The currency is not valid.");
 
             if (accountId == Guid.Empty)
-                throw new ArgumentException("La cuenta es obligatoria.", nameof(accountId));
+                throw new ArgumentException("The account is required.", nameof(accountId));
 
             Id = Guid.NewGuid();
             Type = type;
@@ -47,6 +45,26 @@ namespace Domain.Entities
             Cancelled = false;
         }
 
-        public void Cancel() => Cancelled = true;
+        public void Cancel()
+        {
+            if (Cancelled)
+                throw new InvalidOperationException("The transaction is already cancelled.");
+            
+            Cancelled = true;
+        }
+        
+        public void ChangeAmount(decimal newAmount)
+        {
+            if (Cancelled)
+                throw new InvalidOperationException("A cancelled transaction cannot be modified.");
+            ValidateAmount(newAmount);
+            Amount = newAmount;
+        }
+
+        private static void ValidateAmount(decimal amount)
+        {
+            if (amount <= 0)
+                throw new ArgumentOutOfRangeException(nameof(amount), "The amount must be greater than zero.");
+        }
     }
 }
