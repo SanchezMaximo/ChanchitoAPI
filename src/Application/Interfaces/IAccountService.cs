@@ -10,8 +10,6 @@ namespace Application.Interfaces
 
        IReadOnlyList<AccountResponse> GetAll();
 
-        AccountResponse DeleteById(Guid id);
-
         AccountResponse Update(Guid id, UpdateAccountRequest request);
 
     }
