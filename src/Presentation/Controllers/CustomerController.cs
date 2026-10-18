@@ -22,7 +22,7 @@ namespace Presentation.Controllers
             {
                 var customer = customerService.Create(request);
 
-                return CreatedAtAction(nameof(GetById), new { id = customer.Id }, customer); //explicacion: setea un id y el email y pass?
+                return CreatedAtAction(nameof(GetById), new { id = customer.Id }, customer); //devuelve 201 si salio bien
             }
             catch (ArgumentException ex) // valida que los datos sean correctos
             {
