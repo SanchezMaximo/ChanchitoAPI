@@ -35,19 +35,10 @@ namespace Presentation.Controllers
         [HttpGet("{id}")]
         public ActionResult<AccountResponse> GetById([FromRoute] Guid id)
         {
-            try
-            {
-                var account = accountService.GetById(id);
-                return Ok(account);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            var account = accountService.GetById(id);
+            if (account is null)
+                return NotFound($"There is no account with id {id}.");
+            return Ok(account);
 
         }
 

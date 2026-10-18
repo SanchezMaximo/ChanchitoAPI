@@ -31,29 +31,13 @@ namespace Application.Services
 
         public AccountResponse? GetById(Guid id)
         {
-            if(id == Guid.Empty)
-                throw new ArgumentException("El id de la cuenta es obligatorio.", nameof(id));
             var account = accountRepository.GetById(id);
-            if(account is null)
-                throw new InvalidOperationException($"No existe una cuenta con el id {id}.");
-        
-            return AccountResponse.From(account);
+
+            return account is null ? null : AccountResponse.From(account);
         }
 
         public IReadOnlyList<AccountResponse> GetAll() =>
             accountRepository.GetAll().Select(AccountResponse.From).ToList();
-
-        public AccountResponse DeleteById(Guid id)
-        {
-            if (id == Guid.Empty)
-                throw new ArgumentException("El id de la cuenta es obligatorio.", nameof(id));
-            var account = accountRepository.GetById(id);
-            if (account is null)
-                throw new InvalidOperationException($"No existe una cuenta con el id {id}.");
-            accountRepository.Remove(account);
-            accountRepository.SaveChanges();
-            return AccountResponse.From(account);
-        }   
 
         public AccountResponse Update(Guid id, UpdateAccountRequest request)
         {
