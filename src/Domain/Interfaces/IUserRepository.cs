@@ -12,6 +12,10 @@ namespace Domain.Interfaces
 
         IReadOnlyList<Customer> GetAllCustomers();
 
+        int CountCustomers();
+
+        int CountActiveCustomers();
+
         void SaveChanges();
     }
 }
