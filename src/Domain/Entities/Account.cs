@@ -50,5 +50,66 @@ namespace Domain.Entities
 
             return name.Trim();
         }
+
+        public Transaction RegisterIncome(string description, decimal amount)
+        {
+            var transaction = new Transaction(TransactionType.Income, description, amount, DateTime.UtcNow, Currency, Id);
+            Balance += amount;
+            Transactions.Add(transaction);
+            return transaction;
+        }
+
+        public Transaction RegisterExpense(string description, decimal amount)
+        {
+            var transaction = new Transaction(TransactionType.Expense, description, amount, DateTime.UtcNow, Currency, Id);
+            if (amount > Balance)
+                throw new InvalidOperationException("Insufficient balance for the expense.");
+            Balance -= amount;
+            Transactions.Add(transaction);
+            return transaction;
+        }
+
+        private Transaction GetTransaction(Guid transactionId)
+        {
+                var transaction = Transactions.FirstOrDefault(t => t.Id == transactionId);
+
+                if (transaction is null)
+                    throw new KeyNotFoundException($"There is no transaction with id {transactionId}.");
+                
+                return transaction;
+
+        }
+        public Transaction ChangeTransactionAmount(Guid transactionId, decimal newAmount)
+        {
+            var transaction = GetTransaction(transactionId);
+
+            var difference = newAmount - transaction.Amount;
+
+            var newBalance = transaction.Type == TransactionType.Income ? Balance + difference : Balance - difference;
+
+            if(newBalance < 0)
+                throw new InvalidOperationException("The change would leave the balance negative.");
+
+            transaction.ChangeAmount(newAmount);
+            Balance = newBalance;
+
+            return transaction;
+        }
+
+        public Transaction CancelTransaction(Guid transactionId)
+        {
+            
+            var transaction = GetTransaction(transactionId);
+
+            var newBalance = transaction.Type == TransactionType.Income ? Balance - transaction.Amount : Balance + transaction.Amount;
+            
+            if(newBalance < 0)
+                throw new InvalidOperationException("Cancelling this transaction would leave the balance negative.");
+
+            transaction.Cancel();
+            Balance = newBalance;
+            
+            return transaction;
+        }
     }
 }
