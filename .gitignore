@@ -10,3 +10,7 @@
 
 # Secretos locales
 appsettings.*.local.json
+
+
+publish/
+*.publishsettings 

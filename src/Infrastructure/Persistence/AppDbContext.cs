@@ -25,6 +25,16 @@ namespace Infrastructure.Persistence
 
             modelBuilder.Entity<User>().UseTpcMappingStrategy();
 
+            modelBuilder.Entity<Account>(entity =>
+            {
+                entity.Property(a => a.Balance).HasPrecision(18, 2);
+            });
+
+            modelBuilder.Entity<Transaction>(entity =>
+            {
+                entity.Property(t => t.Amount).HasPrecision(18, 2);
+            });
+
             modelBuilder.Entity<Category>(entity =>
             {
                 entity.Property(c => c.Name)
