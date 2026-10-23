@@ -16,6 +16,7 @@ namespace Infrastructure.Persistence
         public DbSet<Customer> Customers => Set<Customer>();
         public DbSet<Administrator> Administrators => Set<Administrator>();
         public DbSet<Category> Categories => Set<Category>();
+        public DbSet<ExchangeRate> ExchangeRates => Set<ExchangeRate>();
         public DbSet<User> Users => Set<User>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -40,6 +41,15 @@ namespace Infrastructure.Persistence
                     .WithMany()
                     .HasForeignKey(c => c.CustomerId)
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<ExchangeRate>(entity =>
+            {
+                entity.Property(e => e.Buy).HasPrecision(18, 4);
+                entity.Property(e => e.Sell).HasPrecision(18, 4);
+
+                // The same rate (source + provider timestamp) is never stored twice.
+                entity.HasIndex(e => new { e.Source, e.UpdatedAt }).IsUnique();
             });
         }
     }
