@@ -27,6 +27,14 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 
+builder.Services.AddScoped<IExchangeRateRepository, ExchangeRateRepository>();
+builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();
+builder.Services.AddHttpClient<IExchangeRateProvider, DolarApiExchangeRateProvider>(client =>
+{
+    client.BaseAddress = new Uri("https://dolarapi.com/");
+    client.Timeout = TimeSpan.FromSeconds(5);
+});
+
 builder.Services.AddControllers()
     .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
