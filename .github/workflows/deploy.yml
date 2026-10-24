@@ -1,0 +1,65 @@
+name: CI/CD - Azure App Service
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+env:
+  AZURE_WEBAPP_NAME: chanchitoapi
+  DOTNET_VERSION: '10.0.x'
+  SOLUTION: ChanchitoAPI.slnx
+  STARTUP_PROJECT: src/Presentation/Presentation.csproj
+  MIGRATIONS_PROJECT: src/Infrastructure/Infrastructure.csproj
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish ${{ env.STARTUP_PROJECT }} --configuration Release --no-build --output ./publish
+
+      # ---- De aca para abajo solo corre en push a main / ejecucion manual ----
+
+      - name: Instalar dotnet-ef
+        if: github.event_name != 'pull_request'
+        run: dotnet tool install --global dotnet-ef --version 10.*
+
+      - name: Actualizar base de datos (migraciones EF Core)
+        if: github.event_name != 'pull_request'
+        env:
+          # Se pasa por variable de entorno para que bash no interprete caracteres
+          # especiales del password (ej. $).
+          DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
+          # Por si Program.cs necesita la connection string para arrancar el host.
+          ConnectionStrings__ChanchitoDb: ${{ secrets.DB_CONNECTION_STRING }}
+        run: |
+          dotnet ef database update \
+            --project ${{ env.MIGRATIONS_PROJECT }} \
+            --startup-project ${{ env.STARTUP_PROJECT }} \
+            --configuration Release \
+            --no-build \
+            --connection "$DB_CONNECTION_STRING"
+
+      - name: Deploy a Azure App Service
+        if: github.event_name != 'pull_request'
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ./publish
