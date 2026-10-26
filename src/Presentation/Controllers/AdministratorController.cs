@@ -1,11 +1,14 @@
 using Application.DTOs;
 using Application.Interfaces;
+using Domain.Constants;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = Roles.Administrator)]
     public class AdministratorController : ControllerBase
     {
         private readonly IAdministratorService administratorService;
