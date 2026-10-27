@@ -48,13 +48,22 @@ jobs:
           DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
           # Por si Program.cs necesita la connection string para arrancar el host.
           ConnectionStrings__ChanchitoDb: ${{ secrets.DB_CONNECTION_STRING }}
+          Jwt__Key: "clave-de-relleno-solo-para-las-migraciones-0000"
         run: |
-          dotnet ef database update \
-            --project ${{ env.MIGRATIONS_PROJECT }} \
-            --startup-project ${{ env.STARTUP_PROJECT }} \
-            --configuration Release \
-            --no-build \
-            --connection "$DB_CONNECTION_STRING"
+          for i in 1 2 3 4 5; do
+            echo "Intento $i de 5"
+            if dotnet ef database update \
+              --project ${{ env.MIGRATIONS_PROJECT }} \
+              --startup-project ${{ env.STARTUP_PROJECT }} \
+              --configuration Release \
+              --no-build \
+              --connection "$DB_CONNECTION_STRING"; then
+              exit 0
+            fi
+            echo "Falló, la base puede estar despertando. Espero 30s..."
+            sleep 30
+          done
+          exit 1
 
       - name: Deploy a Azure App Service
         if: github.event_name != 'pull_request'
