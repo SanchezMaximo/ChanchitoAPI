@@ -9,20 +9,27 @@ namespace Application.Services
     public class TransactionService : ITransactionService
     {  
         private readonly IAccountRepository accountRepository;
+        private readonly IExchangeRateService exchangeRateService;
 
 
-        public TransactionService(IAccountRepository accountRepository)
+        public TransactionService(IAccountRepository accountRepository, IExchangeRateService exchangeRateService)
         {
             this.accountRepository = accountRepository;
+            this.exchangeRateService = exchangeRateService;
         }
 
-        public TransactionResponse Register(Guid accountId, CreateTransactionRequest request )
+        public async Task<TransactionResponse> RegisterAsync(Guid accountId, CreateTransactionRequest request, CancellationToken cancellationToken = default)
         {   
             var account = GetAccountOrThrow(accountId);
 
+            // Dollar accounts store the official rate of the moment; pesos accounts do not need it.
+            Guid? exchangeRateId = account.Currency == Currency.USD
+                ? await exchangeRateService.GetCurrentRateIdAsync(ExchangeRateSource.Official, cancellationToken)
+                : null;
+
             var transaction = request.Type == TransactionType.Income
-                ? account.RegisterIncome(request.Description, request.Amount)
-                : account.RegisterExpense(request.Description, request.Amount);
+                ? account.RegisterIncome(request.Description, request.Amount, exchangeRateId)
+                : account.RegisterExpense(request.Description, request.Amount, exchangeRateId);
             
             accountRepository.AddTransaction(transaction);
             accountRepository.SaveChanges();

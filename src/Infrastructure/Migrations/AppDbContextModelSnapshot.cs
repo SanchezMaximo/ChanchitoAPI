@@ -128,12 +128,17 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("ExchangeRateId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AccountId");
+
+                    b.HasIndex("ExchangeRateId");
 
                     b.ToTable("Transactions");
                 });
@@ -200,6 +205,11 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Domain.Entities.ExchangeRate", null)
+                        .WithMany()
+                        .HasForeignKey("ExchangeRateId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("Domain.Entities.Account", b =>
