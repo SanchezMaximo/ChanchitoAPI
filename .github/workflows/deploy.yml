@@ -54,7 +54,7 @@ jobs:
             if dotnet ef database update \
               --project ${{ env.MIGRATIONS_PROJECT }} \
               --startup-project ${{ env.STARTUP_PROJECT }} \
-              --configuration Release \git push --set-upstream origin ci/jwt-key-migraciones
+              --configuration Release \
               --no-build \
               --connection "$DB_CONNECTION_STRING"; then
               exit 0
