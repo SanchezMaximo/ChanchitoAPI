@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using Application.Interfaces;
@@ -7,6 +8,7 @@ using Infrastructure.ExternalServices;
 using Infrastructure.Persistence;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Presentation.Extensions;
@@ -68,9 +70,27 @@ builder.Services
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
             ClockSkew = TimeSpan.FromSeconds(30)
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            // A token can outlive the user's status: reject it if the user was suspended after logging in.
+            OnTokenValidated = context =>
+            {
+                var email = context.Principal?.FindFirst(ClaimTypes.Email)?.Value;
+                var userRepository = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+                var user = email is null ? null : userRepository.GetByEmail(email);
+
+                if (user is null || !user.IsActive)
+                    context.Fail("The user does not exist or is suspended.");
+
+                return Task.CompletedTask;
+            }
+        };
     });
 
-builder.Services.AddAuthorization();
+// Secure by default: every endpoint requires a valid token unless it has [AllowAnonymous].
+builder.Services.AddAuthorizationBuilder()
+    .SetFallbackPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
 
 builder.Services.AddControllers()
     .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));

@@ -1,5 +1,6 @@
 using Application.DTOs;
 using Application.Interfaces;
+using Domain.Entities;
 using Domain.Enums;
 using Domain.Exceptions;
 using Domain.Interfaces;
@@ -22,12 +23,23 @@ namespace Application.Services
             var responses = new List<ExchangeRateResponse>();
 
             foreach (var source in Enum.GetValues<ExchangeRateSource>())
-                responses.Add(await GetBySourceAsync(source, cancellationToken));
+            {
+                var (rate, isStale) = await ResolveAsync(source, cancellationToken);
+                responses.Add(ExchangeRateResponse.From(rate, isStale));
+            }
 
             return responses;
         }
 
-        private async Task<ExchangeRateResponse> GetBySourceAsync(ExchangeRateSource source, CancellationToken cancellationToken)
+        public async Task<Guid> GetCurrentRateIdAsync(ExchangeRateSource source, CancellationToken cancellationToken = default)
+        {
+            var (rate, _) = await ResolveAsync(source, cancellationToken);
+
+            return rate.Id;
+        }
+
+        // Always returns a rate that is already saved in the database, so its Id can be referenced.
+        private async Task<(ExchangeRate Rate, bool IsStale)> ResolveAsync(ExchangeRateSource source, CancellationToken cancellationToken)
         {
             try
             {
@@ -39,9 +51,12 @@ namespace Application.Services
                 {
                     repository.Add(current);
                     repository.SaveChanges();
+
+                    return (current, false);
                 }
 
-                return ExchangeRateResponse.From(current);
+                // That rate was already saved: use the saved one.
+                return (latest, false);
             }
             catch (ExchangeRateUnavailableException)
             {
@@ -49,7 +64,7 @@ namespace Application.Services
                     ?? throw new ExchangeRateUnavailableException(
                         $"The {source} exchange rate is unavailable and there is no saved rate yet.");
 
-                return ExchangeRateResponse.From(latest, isStale: true);
+                return (latest, true);
             }
         }
     }

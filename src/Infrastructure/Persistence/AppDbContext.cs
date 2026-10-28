@@ -33,6 +33,12 @@ namespace Infrastructure.Persistence
             modelBuilder.Entity<Transaction>(entity =>
             {
                 entity.Property(t => t.Amount).HasPrecision(18, 2);
+
+                // A rate that is used by a transaction can never be deleted.
+                entity.HasOne<ExchangeRate>()
+                    .WithMany()
+                    .HasForeignKey(t => t.ExchangeRateId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Category>(entity =>
