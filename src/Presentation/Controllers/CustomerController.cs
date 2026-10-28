@@ -1,6 +1,9 @@
 using Application.DTOs;
 using Application.Interfaces;
+using Domain.Constants;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Extensions;
 
 namespace Presentation.Controllers
 {
@@ -15,7 +18,9 @@ namespace Presentation.Controllers
             this.customerService = customerService;
         }
 
+        // Public: anyone can register without a session.
         [HttpPost]
+        [AllowAnonymous]
         public ActionResult<CustomerResponse> Create([FromBody] CreateCustomerRequest request) //revisar
         {
             try
@@ -34,7 +39,9 @@ namespace Presentation.Controllers
             }
         }
 
+        // Only administrators can list every customer.
         [HttpGet]
+        [Authorize(Roles = Roles.Administrator)]
         public ActionResult<IReadOnlyList<CustomerResponse>> GetAll()
         {
             var customers = customerService.GetAll();
@@ -47,9 +54,14 @@ namespace Presentation.Controllers
             return Ok(customers);
         }
 
+        // A customer can only see their own data; an administrator can see anyone's.
         [HttpGet("{id}")]
+        [Authorize]
         public ActionResult<CustomerResponse> GetById([FromRoute] Guid id)
         {
+            if (!User.IsInRole(Roles.Administrator) && User.GetUserId() != id)
+                return Forbid();
+
             var customer = customerService.GetById(id);
 
             if (customer == null)

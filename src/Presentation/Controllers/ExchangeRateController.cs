@@ -1,12 +1,14 @@
 using Application.DTOs;
 using Application.Interfaces;
 using Domain.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers
 {
     [Route("api/exchange-rate")]
     [ApiController]
+    [AllowAnonymous]
     public class ExchangeRateController : ControllerBase
     {
         private readonly IExchangeRateService exchangeRateService;

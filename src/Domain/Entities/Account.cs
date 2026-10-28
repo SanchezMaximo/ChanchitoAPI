@@ -51,17 +51,17 @@ namespace Domain.Entities
             return name.Trim();
         }
 
-        public Transaction RegisterIncome(string description, decimal amount)
+        public Transaction RegisterIncome(string description, decimal amount, Guid? exchangeRateId = null)
         {
-            var transaction = new Transaction(TransactionType.Income, description, amount, DateTime.UtcNow, Currency, Id);
+            var transaction = new Transaction(TransactionType.Income, description, amount, DateTime.UtcNow, Currency, Id, exchangeRateId);
             Balance += amount;
             Transactions.Add(transaction);
             return transaction;
         }
 
-        public Transaction RegisterExpense(string description, decimal amount)
+        public Transaction RegisterExpense(string description, decimal amount, Guid? exchangeRateId = null)
         {
-            var transaction = new Transaction(TransactionType.Expense, description, amount, DateTime.UtcNow, Currency, Id);
+            var transaction = new Transaction(TransactionType.Expense, description, amount, DateTime.UtcNow, Currency, Id, exchangeRateId);
             if (amount > Balance)
                 throw new InvalidOperationException("Insufficient balance for the expense.");
             Balance -= amount;
