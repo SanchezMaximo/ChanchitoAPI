@@ -46,8 +46,6 @@ jobs:
           # Se pasa por variable de entorno para que bash no interprete caracteres
           # especiales del password (ej. $).
           DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
-          # Por si Program.cs necesita la connection string para arrancar el host.
-          ConnectionStrings__ChanchitoDb: ${{ secrets.DB_CONNECTION_STRING }}
         run: |
           for i in 1 2 3 4 5; do
             echo "Intento $i de 5"
