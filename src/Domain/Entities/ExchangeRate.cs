@@ -10,7 +10,6 @@ public class ExchangeRate
     public decimal Sell { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
-    // Required by EF Core
     private ExchangeRate() { }
 
     public ExchangeRate(ExchangeRateSource source, decimal buy, decimal sell, DateTime updatedAt)

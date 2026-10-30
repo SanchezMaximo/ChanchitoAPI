@@ -24,6 +24,15 @@ namespace Infrastructure.Repositories
                 .OrderBy(c => c.Name)
                 .ToList();
 
+        public IReadOnlyList<Category> GetVisibleToCustomer(Guid customerId) =>
+            context.Categories
+                .Where(c => c.CustomerId == null || c.CustomerId == customerId)
+                .OrderBy(c => c.Name)
+                .ToList();
+
+        public bool CustomerCategoryNameExists(Guid customerId, string name) =>
+            context.Categories.Any(c => c.CustomerId == customerId && c.Name == name);
+
         public bool SystemCategoryNameExists(string name, Guid? excludeId = null) =>
             context.Categories.Any(c =>
                 c.CustomerId == null

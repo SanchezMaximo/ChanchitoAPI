@@ -38,7 +38,6 @@ namespace Application.Services
             return rate.Id;
         }
 
-        // Always returns a rate that is already saved in the database, so its Id can be referenced.
         private async Task<(ExchangeRate Rate, bool IsStale)> ResolveAsync(ExchangeRateSource source, CancellationToken cancellationToken)
         {
             try
@@ -46,7 +45,6 @@ namespace Application.Services
                 var current = await provider.GetAsync(source, cancellationToken);
                 var latest = repository.GetLatest(source);
 
-                // Only store it when the provider published a new rate.
                 if (latest is null || latest.UpdatedAt != current.UpdatedAt)
                 {
                     repository.Add(current);
@@ -55,7 +53,6 @@ namespace Application.Services
                     return (current, false);
                 }
 
-                // That rate was already saved: use the saved one.
                 return (latest, false);
             }
             catch (ExchangeRateUnavailableException)

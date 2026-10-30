@@ -34,11 +34,15 @@ namespace Infrastructure.Persistence
             {
                 entity.Property(t => t.Amount).HasPrecision(18, 2);
 
-                // A rate that is used by a transaction can never be deleted.
                 entity.HasOne<ExchangeRate>()
                     .WithMany()
                     .HasForeignKey(t => t.ExchangeRateId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne<Category>()
+                    .WithMany()
+                    .HasForeignKey(t => t.CategoryId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<Category>(entity =>
@@ -47,8 +51,6 @@ namespace Infrastructure.Persistence
                     .IsRequired()
                     .HasMaxLength(Category.MaxNameLength);
 
-                // CustomerId is null for system categories, so this also keeps system names unique.
-                // HasFilter(null) removes EF's default "IS NOT NULL" filter, which would skip the system rows.
                 entity.HasIndex(c => new { c.CustomerId, c.Name })
                     .IsUnique()
                     .HasFilter(null);
@@ -63,8 +65,7 @@ namespace Infrastructure.Persistence
             {
                 entity.Property(e => e.Buy).HasPrecision(18, 4);
                 entity.Property(e => e.Sell).HasPrecision(18, 4);
-
-                // The same rate (source + provider timestamp) is never stored twice.
+                
                 entity.HasIndex(e => new { e.Source, e.UpdatedAt }).IsUnique();
             });
         }
