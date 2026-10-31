@@ -16,11 +16,17 @@ namespace Domain.Entities
         public Guid? ExchangeRateId { get; private set; }
         public Guid? GoalId { get; private set; }
 
+        public Guid? CategoryId { get; private set; }
+
         private Transaction()
         {
         }
 
+<<<<<<< HEAD
         public Transaction(TransactionType type, string description, decimal amount, DateTime date, Currency currency, Guid accountId, Guid? exchangeRateId = null, Guid? goalId = null)
+=======
+        public Transaction(TransactionType type, string description, decimal amount, DateTime date, Currency currency, Guid accountId, Guid? exchangeRateId = null, Guid? categoryId = null)
+>>>>>>> origin/main
         {
             if (!Enum.IsDefined(type))
                 throw new ArgumentOutOfRangeException(nameof(type), "The transaction type is not valid.");
@@ -45,11 +51,16 @@ namespace Domain.Entities
             if (currency == Currency.USD && exchangeRateId is null)
                 throw new ArgumentException("A dollar transaction must store the exchange rate of the moment.", nameof(exchangeRateId));
 
+<<<<<<< HEAD
             if (goalId == Guid.Empty)
                 throw new ArgumentException("The goal is not valid.", nameof(goalId));
 
             if (goalId is not null && type != TransactionType.Expense)
                 throw new ArgumentException("Only an expense can be a goal contribution.", nameof(goalId));
+=======
+            if (categoryId == Guid.Empty)
+                throw new ArgumentException("The category is not valid.", nameof(categoryId));
+>>>>>>> origin/main
 
             Id = Guid.NewGuid();
             Type = type;
@@ -59,6 +70,7 @@ namespace Domain.Entities
             Currency = currency;
             AccountId = accountId;
             ExchangeRateId = currency == Currency.USD ? exchangeRateId : null;
+            CategoryId = categoryId;
             Cancelled = false;
             GoalId = goalId;
         }

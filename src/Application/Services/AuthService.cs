@@ -22,13 +22,11 @@ namespace Application.Services
         {
             var user = userRepository.GetByEmail(request.Email ?? string.Empty);
 
-            // Same message for an unknown email and a wrong password, so emails cannot be guessed.
             if (user is null
                 || string.IsNullOrEmpty(request.Password)
                 || !passwordHasher.Verify(request.Password, user.PasswordHash))
                 throw new UnauthorizedAccessException("Invalid email or password.");
 
-            // The password is checked first, so the suspended status is only revealed to the real owner.
             if (!user.IsActive)
                 throw new UserSuspendedException("This user is suspended and cannot log in.");
 

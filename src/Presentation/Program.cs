@@ -37,6 +37,7 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IAdministratorService, AdministratorService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();
 
 // Exchange rates (DolarAPI)
@@ -74,7 +75,6 @@ builder.Services
 
         options.Events = new JwtBearerEvents
         {
-            // A token can outlive the user's status: reject it if the user was suspended after logging in.
             OnTokenValidated = context =>
             {
                 var email = context.Principal?.FindFirst(ClaimTypes.Email)?.Value;
@@ -89,7 +89,6 @@ builder.Services
         };
     });
 
-// Secure by default: every endpoint requires a valid token unless it has [AllowAnonymous].
 builder.Services.AddAuthorizationBuilder()
     .SetFallbackPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
 
