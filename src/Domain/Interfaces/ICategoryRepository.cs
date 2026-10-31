@@ -10,7 +10,11 @@ namespace Domain.Interfaces
 
         IReadOnlyList<Category> GetSystemCategories();
 
+        IReadOnlyList<Category> GetVisibleToCustomer(Guid customerId);
+
         bool SystemCategoryNameExists(string name, Guid? excludeId = null);
+
+        bool CustomerCategoryNameExists(Guid customerId, string name);
 
         void Remove(Category category);
 

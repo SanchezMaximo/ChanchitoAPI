@@ -10,26 +10,29 @@ namespace Application.Services
     {  
         private readonly IAccountRepository accountRepository;
         private readonly IExchangeRateService exchangeRateService;
+        private readonly ICategoryRepository categoryRepository;
 
 
-        public TransactionService(IAccountRepository accountRepository, IExchangeRateService exchangeRateService)
+        public TransactionService(IAccountRepository accountRepository, IExchangeRateService exchangeRateService, ICategoryRepository categoryRepository)
         {
             this.accountRepository = accountRepository;
             this.exchangeRateService = exchangeRateService;
+            this.categoryRepository = categoryRepository;
         }
 
         public async Task<TransactionResponse> RegisterAsync(Guid accountId, CreateTransactionRequest request, CancellationToken cancellationToken = default)
         {   
             var account = GetAccountOrThrow(accountId);
 
-            // Dollar accounts store the official rate of the moment; pesos accounts do not need it.
+            ValidateCategory(request.CategoryId, account.CustomerId);
+
             Guid? exchangeRateId = account.Currency == Currency.USD
                 ? await exchangeRateService.GetCurrentRateIdAsync(ExchangeRateSource.Official, cancellationToken)
                 : null;
 
             var transaction = request.Type == TransactionType.Income
-                ? account.RegisterIncome(request.Description, request.Amount, exchangeRateId)
-                : account.RegisterExpense(request.Description, request.Amount, exchangeRateId);
+                ? account.RegisterIncome(request.Description, request.Amount, exchangeRateId, request.CategoryId)
+                : account.RegisterExpense(request.Description, request.Amount, exchangeRateId, request.CategoryId);
             
             accountRepository.AddTransaction(transaction);
             accountRepository.SaveChanges();
@@ -66,6 +69,17 @@ namespace Application.Services
                 .OrderByDescending(t => t.Date)
                 .Select(TransactionResponse.From)
                 .ToList();
+        }
+
+        private void ValidateCategory(Guid? categoryId, Guid customerId)
+        {
+            if (categoryId is null)
+                return;
+
+            var category = categoryRepository.GetById(categoryId.Value);
+
+            if (category is null || (!category.IsSystem && category.CustomerId != customerId))
+                throw new ArgumentException("The category does not exist.", nameof(categoryId));
         }
 
         private Account GetAccountOrThrow(Guid accountId) =>

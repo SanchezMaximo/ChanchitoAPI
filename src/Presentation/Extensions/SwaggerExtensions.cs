@@ -5,7 +5,6 @@ namespace Presentation.Extensions
 {
     public static class SwaggerExtensions
     {
-        // Adds the "Authorize" button to Swagger so the JWT can be sent in the requests.
         public static SwaggerGenOptions AddJwtSupport(this SwaggerGenOptions options)
         {
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

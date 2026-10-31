@@ -47,7 +47,7 @@ namespace Presentation.Controllers
             {
                 return Conflict(ex.Message);
             }
-            catch (ExchangeRateUnavailableException ex) // DolarAPI is down and there is no saved rate
+            catch (ExchangeRateUnavailableException ex) 
             {
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
             }
@@ -121,8 +121,6 @@ namespace Presentation.Controllers
             }
         }
 
-        // Returns null when the account exists and belongs to the logged-in customer.
-        // Otherwise returns the error to send back (404 if it does not exist, 403 if it is someone else's).
         private ActionResult? CheckOwnership(Guid accountId)
         {
             var account = accountService.GetById(accountId);

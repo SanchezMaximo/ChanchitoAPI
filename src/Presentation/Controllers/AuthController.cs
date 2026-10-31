@@ -25,11 +25,11 @@ namespace Presentation.Controllers
             {
                 return Ok(authService.Login(request));
             }
-            catch (UnauthorizedAccessException ex) // wrong email or password -> 401
+            catch (UnauthorizedAccessException ex) // 401
             {
                 return Unauthorized(ex.Message);
             }
-            catch (UserSuspendedException ex) // suspended user -> 403
+            catch (UserSuspendedException ex) // 403
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ex.Message);
             }

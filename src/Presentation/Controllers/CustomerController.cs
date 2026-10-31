@@ -18,7 +18,6 @@ namespace Presentation.Controllers
             this.customerService = customerService;
         }
 
-        // Public: anyone can register without a session.
         [HttpPost]
         [AllowAnonymous]
         public ActionResult<CustomerResponse> Create([FromBody] CreateCustomerRequest request) //revisar
@@ -39,7 +38,6 @@ namespace Presentation.Controllers
             }
         }
 
-        // Only administrators can list every customer.
         [HttpGet]
         [Authorize(Roles = Roles.Administrator)]
         public ActionResult<IReadOnlyList<CustomerResponse>> GetAll()
@@ -54,7 +52,6 @@ namespace Presentation.Controllers
             return Ok(customers);
         }
 
-        // A customer can only see their own data; an administrator can see anyone's.
         [HttpGet("{id}")]
         [Authorize]
         public ActionResult<CustomerResponse> GetById([FromRoute] Guid id)

@@ -23,7 +23,6 @@ namespace Presentation.Controllers
         {
             try
             {
-                // The owner is always the logged-in customer, whatever CustomerId the body says.
                 var createdAccount = accountService.Create(request with { CustomerId = User.GetUserId() });
                 return CreatedAtAction(nameof(GetById), new { id = createdAccount.Id }, createdAccount);
             }
@@ -45,7 +44,6 @@ namespace Presentation.Controllers
             if (account is null)
                 return NotFound($"There is no account with id {id}.");
 
-            // A customer can only see their own accounts.
             if (account.CustomerId != User.GetUserId())
                 return Forbid();
 
@@ -58,7 +56,6 @@ namespace Presentation.Controllers
         {
             var userId = User.GetUserId();
 
-            // Only the accounts of the logged-in customer.
             var accounts = accountService.GetAll()
                 .Where(a => a.CustomerId == userId)
                 .ToList();
