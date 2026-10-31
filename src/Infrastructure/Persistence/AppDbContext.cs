@@ -40,6 +40,12 @@ namespace Infrastructure.Persistence
                     .WithMany()
                     .HasForeignKey(t => t.ExchangeRateId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne<Goal>()
+                    .WithMany()
+                    .HasForeignKey(t => t.GoalId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
             });
 
             modelBuilder.Entity<Category>(entity =>

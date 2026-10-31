@@ -13,15 +13,14 @@ namespace Domain.Entities
         public Currency Currency { get; private set; }
         public bool Cancelled { get; private set; }
 
-        // Rate (from the ExchangeRates table) in force when the transaction was made.
-        // Only dollar transactions store it; it is null for pesos.
         public Guid? ExchangeRateId { get; private set; }
+        public Guid? GoalId { get; private set; }
 
         private Transaction()
         {
         }
 
-        public Transaction(TransactionType type, string description, decimal amount, DateTime date, Currency currency, Guid accountId, Guid? exchangeRateId = null)
+        public Transaction(TransactionType type, string description, decimal amount, DateTime date, Currency currency, Guid accountId, Guid? exchangeRateId = null, Guid? goalId = null)
         {
             if (!Enum.IsDefined(type))
                 throw new ArgumentOutOfRangeException(nameof(type), "The transaction type is not valid.");
@@ -46,6 +45,12 @@ namespace Domain.Entities
             if (currency == Currency.USD && exchangeRateId is null)
                 throw new ArgumentException("A dollar transaction must store the exchange rate of the moment.", nameof(exchangeRateId));
 
+            if (goalId == Guid.Empty)
+                throw new ArgumentException("The goal is not valid.", nameof(goalId));
+
+            if (goalId is not null && type != TransactionType.Expense)
+                throw new ArgumentException("Only an expense can be a goal contribution.", nameof(goalId));
+
             Id = Guid.NewGuid();
             Type = type;
             Description = description;
@@ -55,6 +60,7 @@ namespace Domain.Entities
             AccountId = accountId;
             ExchangeRateId = currency == Currency.USD ? exchangeRateId : null;
             Cancelled = false;
+            GoalId = goalId;
         }
 
         public void Cancel()

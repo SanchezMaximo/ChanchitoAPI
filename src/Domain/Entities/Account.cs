@@ -59,9 +59,9 @@ namespace Domain.Entities
             return transaction;
         }
 
-        public Transaction RegisterExpense(string description, decimal amount, Guid? exchangeRateId = null)
+        public Transaction RegisterExpense(string description, decimal amount, Guid? exchangeRateId = null, Guid? goalId = null)
         {
-            var transaction = new Transaction(TransactionType.Expense, description, amount, DateTime.UtcNow, Currency, Id, exchangeRateId);
+            var transaction = new Transaction(TransactionType.Expense, description, amount, DateTime.UtcNow, Currency, Id, exchangeRateId, goalId);
             if (amount > Balance)
                 throw new InvalidOperationException("Insufficient balance for the expense.");
             Balance -= amount;
