@@ -40,18 +40,15 @@ namespace Infrastructure.Persistence
                     .HasForeignKey(t => t.ExchangeRateId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-<<<<<<< HEAD
-                entity.HasOne<Goal>()
-                    .WithMany()
-                    .HasForeignKey(t => t.GoalId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-=======
                 entity.HasOne<Category>()
                     .WithMany()
                     .HasForeignKey(t => t.CategoryId)
                     .OnDelete(DeleteBehavior.SetNull);
->>>>>>> origin/main
+
+                entity.HasOne<Goal>()
+                    .WithMany()
+                    .HasForeignKey(t => t.GoalId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Category>(entity =>
@@ -74,21 +71,20 @@ namespace Infrastructure.Persistence
             {
                 entity.Property(e => e.Buy).HasPrecision(18, 4);
                 entity.Property(e => e.Sell).HasPrecision(18, 4);
-                
+
                 entity.HasIndex(e => new { e.Source, e.UpdatedAt }).IsUnique();
             });
 
             modelBuilder.Entity<Goal>(entity =>
             {
-                entity.Property(g => g.TargetAmount).HasPrecision(18,2);
+                entity.Property(g => g.TargetAmount).HasPrecision(18, 2);
                 entity.Property(g => g.SavedAmount).HasPrecision(18, 2);
 
                 entity.HasOne<Customer>()
                     .WithMany()
                     .HasForeignKey(g => g.CustomerId)
                     .OnDelete(DeleteBehavior.Restrict);
-            }
-            );
+            });
         }
     }
 }
