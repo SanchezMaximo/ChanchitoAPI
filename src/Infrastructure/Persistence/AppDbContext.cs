@@ -18,6 +18,7 @@ namespace Infrastructure.Persistence
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<ExchangeRate> ExchangeRates => Set<ExchangeRate>();
         public DbSet<User> Users => Set<User>();
+        public DbSet<Goal> Goals => Set<Goal>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -67,6 +68,18 @@ namespace Infrastructure.Persistence
                 // The same rate (source + provider timestamp) is never stored twice.
                 entity.HasIndex(e => new { e.Source, e.UpdatedAt }).IsUnique();
             });
+
+            modelBuilder.Entity<Goal>(entity =>
+            {
+                entity.Property(g => g.TargetAmount).HasPrecision(18,2);
+                entity.Property(g => g.SavedAmount).HasPrecision(18, 2);
+
+                entity.HasOne<Customer>()
+                    .WithMany()
+                    .HasForeignKey(g => g.CustomerId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            }
+            );
         }
     }
 }
