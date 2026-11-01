@@ -38,7 +38,14 @@ namespace Domain.Entities
             Currency = currency;
             CustomerId = customerId;
         }
-        
+
+        public Goal(string name, decimal targetAmount, Currency currency)
+        {
+            Name = name;
+            TargetAmount = targetAmount;
+            Currency = currency;
+        }
+
         private static string NormalizeName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))

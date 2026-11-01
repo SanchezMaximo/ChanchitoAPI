@@ -39,6 +39,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();
+builder.Services.AddScoped<IGoalService, GoalService>();
 
 // Exchange rates (DolarAPI)
 builder.Services.AddHttpClient<IExchangeRateProvider, DolarApiExchangeRateProvider>(client =>
