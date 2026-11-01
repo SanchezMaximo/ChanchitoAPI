@@ -1,6 +1,7 @@
 using Application.DTOs;
 using Application.Interfaces;
 using Domain.Constants;
+using Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Extensions;
@@ -33,6 +34,39 @@ namespace Presentation.Controllers
                 return BadRequest(ex.Message);
             }
 
+        }
+        
+        [HttpPost("{id}/contribute")]
+        public async Task<ActionResult<GoalResponse>> Contribute(
+            [FromRoute] Guid id,
+            [FromBody] ContributeRequest request,
+            CancellationToken cancellationToken)
+        {
+            try
+            {
+                var goal = await goalService.ContributeAsync(User.GetUserId(), id, request, cancellationToken);
+                return Ok(goal);
+            }
+            catch (ExchangeRateUnavailableException ex)
+            {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
 
 
