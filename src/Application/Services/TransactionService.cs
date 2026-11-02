@@ -42,6 +42,7 @@ namespace Application.Services
         public TransactionResponse ChangeAmount(Guid accountId, Guid transactionId, UpdateTransactionRequest request)
         {   
             var account = GetAccountOrThrow(accountId);
+            EnsureNotGoalContribution(account, transactionId);
 
             var transaction = account.ChangeTransactionAmount(transactionId, request.Amount);
 
@@ -53,6 +54,8 @@ namespace Application.Services
         public TransactionResponse Cancel(Guid accountId, Guid transactionId)
         {   
             var account = GetAccountOrThrow(accountId);
+            EnsureNotGoalContribution(account, transactionId);
+            
             var transaction = account.CancelTransaction(transactionId);
             accountRepository.SaveChanges();
             return TransactionResponse.From(transaction);
@@ -85,6 +88,16 @@ namespace Application.Services
         private Account GetAccountOrThrow(Guid accountId) =>
             accountRepository.GetById(accountId)
             ?? throw new KeyNotFoundException($"There is no account with id {accountId}.");
+
+
+        private static void EnsureNotGoalContribution(Account account, Guid transactionId)
+        {
+            var transaction = account.Transactions.FirstOrDefault(t => t.Id == transactionId);
+
+            if (transaction?.GoalId is not null)
+                throw new InvalidOperationException("This transaction is a goal contribution. Modify or cancel it from the goal.");
+        }
     }
+    
     
 }
