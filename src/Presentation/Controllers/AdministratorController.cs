@@ -18,6 +18,25 @@ namespace Presentation.Controllers
             this.administratorService = administratorService;
         }
 
+        [HttpPost]
+        public ActionResult<AdministratorResponse> CreateAdministrator([FromBody] CreateAdministratorRequest request)
+        {
+            try
+            {
+                var administrator = administratorService.CreateAdministrator(request);
+
+                return StatusCode(StatusCodes.Status201Created, administrator);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
         [HttpGet("customers")]
         public ActionResult<IReadOnlyList<CustomerResponse>> ListCustomers()
         {

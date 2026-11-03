@@ -9,11 +9,37 @@ namespace Application.Services
     {
         private readonly IUserRepository userRepository;
         private readonly ICategoryRepository categoryRepository;
+        private readonly IPasswordHasher passwordHasher;
 
-        public AdministratorService(IUserRepository userRepository, ICategoryRepository categoryRepository)
+        public AdministratorService(
+            IUserRepository userRepository,
+            ICategoryRepository categoryRepository,
+            IPasswordHasher passwordHasher)
         {
             this.userRepository = userRepository;
             this.categoryRepository = categoryRepository;
+            this.passwordHasher = passwordHasher;
+        }
+
+        public AdministratorResponse CreateAdministrator(CreateAdministratorRequest request)
+        {
+            if (request is null || string.IsNullOrWhiteSpace(request.Email))
+                throw new ArgumentException("The email is required.", nameof(request));
+
+            if (string.IsNullOrWhiteSpace(request.Password) || request.Password.Length < 8)
+                throw new ArgumentException("The password must be at least 8 characters long.", nameof(request));
+
+            var email = request.Email.Trim();
+
+            if (userRepository.GetByEmail(email) is not null)
+                throw new InvalidOperationException($"A user with the email {email} already exists.");
+
+            var administrator = new Administrator(email, passwordHasher.Hash(request.Password));
+
+            userRepository.Add(administrator);
+            userRepository.SaveChanges();
+
+            return AdministratorResponse.From(administrator);
         }
 
         public IReadOnlyList<CustomerResponse> ListCustomers() =>
