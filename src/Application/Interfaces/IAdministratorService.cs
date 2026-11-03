@@ -8,6 +8,8 @@ namespace Application.Interfaces
 
         CustomerCountResponse CountCustomers();
 
+        AdministratorResponse CreateAdministrator(CreateAdministratorRequest request);
+
         CustomerResponse SuspendCustomer(Guid customerId);
 
         CustomerResponse ReactivateCustomer(Guid customerId);
