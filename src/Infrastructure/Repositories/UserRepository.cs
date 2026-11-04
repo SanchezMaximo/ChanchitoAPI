@@ -29,6 +29,9 @@ namespace Infrastructure.Repositories
                 .Include(c => c.Accounts)
                 .ToList();
 
+        public IReadOnlyList<Administrator> GetAllAdministrators() =>
+            context.Administrators.ToList();
+
         public int CountCustomers() => context.Customers.Count();
 
         public int CountActiveCustomers() => context.Customers.Count(c => c.IsActive);

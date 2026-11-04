@@ -42,6 +42,9 @@ namespace Application.Services
             return AdministratorResponse.From(administrator);
         }
 
+        public IReadOnlyList<AdministratorResponse> ListAdministrators() =>
+            userRepository.GetAllAdministrators().Select(AdministratorResponse.From).ToList();
+
         public IReadOnlyList<CustomerResponse> ListCustomers() =>
             userRepository.GetAllCustomers().Select(CustomerResponse.From).ToList();
 
