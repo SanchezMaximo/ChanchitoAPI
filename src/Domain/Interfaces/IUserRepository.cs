@@ -12,6 +12,8 @@ namespace Domain.Interfaces
 
         IReadOnlyList<Customer> GetAllCustomers();
 
+        IReadOnlyList<Administrator> GetAllAdministrators();
+
         int CountCustomers();
 
         int CountActiveCustomers();

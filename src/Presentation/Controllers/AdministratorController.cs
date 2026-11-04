@@ -37,6 +37,12 @@ namespace Presentation.Controllers
             }
         }
 
+        [HttpGet]
+        public ActionResult<IReadOnlyList<AdministratorResponse>> ListAdministrators()
+        {
+            return Ok(administratorService.ListAdministrators());
+        }
+
         [HttpGet("customers")]
         public ActionResult<IReadOnlyList<CustomerResponse>> ListCustomers()
         {

@@ -10,6 +10,8 @@ namespace Application.Interfaces
 
         AdministratorResponse CreateAdministrator(CreateAdministratorRequest request);
 
+        IReadOnlyList<AdministratorResponse> ListAdministrators();
+
         CustomerResponse SuspendCustomer(Guid customerId);
 
         CustomerResponse ReactivateCustomer(Guid customerId);
