@@ -85,6 +85,25 @@ namespace Domain.Entities
             
             SavedAmount -= amount;
         }
+        
+        public void AdjustContribution(decimal oldAmount, decimal newAmount)
+        {
+            if (newAmount <= 0)
+                throw new ArgumentOutOfRangeException(nameof(newAmount), "The contribution must be greater than zero.");
+
+            var difference = newAmount - oldAmount;
+
+            if (difference == 0)
+                return;
+
+            if (difference > Remaining)
+                throw new InvalidOperationException($"The change exceeds the remaining amount ({Remaining}).");
+
+            if (SavedAmount + difference < 0)
+                throw new InvalidOperationException($"The change would leave the saved amount negative ({SavedAmount}).");
+
+            SavedAmount += difference;
+        }
 
     }
 
