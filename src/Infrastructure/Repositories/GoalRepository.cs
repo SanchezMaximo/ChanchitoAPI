@@ -24,6 +24,10 @@ namespace Infrastructure.Repositories
         
         public void SaveChanges() => context.SaveChanges();
 
-
+        public IReadOnlyList<Transaction> GetContributions(Guid goalId) =>
+            context.Transactions
+                .Where(t => t.GoalId == goalId)
+                .OrderByDescending(t => t.Date)
+                .ToList();
     }
 }

@@ -36,39 +36,6 @@ namespace Presentation.Controllers
 
         }
         
-        [HttpPost("{id}/contribute")]
-        public async Task<ActionResult<GoalResponse>> Contribute(
-            [FromRoute] Guid id,
-            [FromBody] ContributeRequest request,
-            CancellationToken cancellationToken)
-        {
-            try
-            {
-                var goal = await goalService.ContributeAsync(User.GetUserId(), id, request, cancellationToken);
-                return Ok(goal);
-            }
-            catch (ExchangeRateUnavailableException ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Forbid();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
 
         [HttpGet("{id}")]
         public ActionResult<GoalResponse> GetById([FromRoute] Guid id)
@@ -114,7 +81,87 @@ namespace Presentation.Controllers
             {
                 return Conflict(ex.Message);
             }
+        }
+    
+
+        [HttpPost("{id}/contribute")]
+        public async Task<ActionResult<GoalResponse>> Contribute(
+            [FromRoute] Guid id,
+            [FromBody] ContributeRequest request,
+            CancellationToken cancellationToken)
+        {
+            try
+            {
+                var goal = await goalService.ContributeAsync(User.GetUserId(), id, request, cancellationToken);
+                return Ok(goal);
+            }
+            catch (ExchangeRateUnavailableException ex)
+            {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+        
+        [HttpGet("{id}/contributions")]
+        public ActionResult<IReadOnlyList<TransactionResponse>> GetContributions([FromRoute] Guid id)
+        {
+            try
+            {
+                var contributions = goalService.GetContributions(User.GetUserId(), id);
+                if (contributions.Count == 0)
+                    return NotFound("This goal has no contributions yet.");
+                
+                return Ok(contributions);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+        }
+
+        [HttpDelete("{id}/contributions/{transactionId}")]
+        public ActionResult<GoalResponse> CancelContribution([FromRoute] Guid id, [FromRoute] Guid transactionId, [FromQuery] Guid accountId)
+        {
+            try
+            {
+                var goal = goalService.CancelContribution(User.GetUserId(), id, accountId, transactionId);
+                return Ok(goal);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
             
         }
+
+
+
     }
 }
