@@ -138,6 +138,32 @@ namespace Presentation.Controllers
             }
         }
 
+        [HttpPatch("{id}/contributions/{transactionId}")]
+        public ActionResult<GoalResponse> ChangeContributionAmount([FromRoute] Guid id, [FromRoute] Guid transactionId, [FromQuery] Guid accountId, [FromBody] UpdateTransactionRequest request)
+        {
+            try
+            {
+                var goal = goalService.ChangeContributionAmount(User.GetUserId(), id, accountId, transactionId, request);
+                return Ok(goal);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
         [HttpDelete("{id}/contributions/{transactionId}")]
         public ActionResult<GoalResponse> CancelContribution([FromRoute] Guid id, [FromRoute] Guid transactionId, [FromQuery] Guid accountId)
         {

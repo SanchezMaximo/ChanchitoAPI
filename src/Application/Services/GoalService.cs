@@ -122,5 +122,29 @@ namespace Application.Services
                 .Select(TransactionResponse.From)
                 .ToList();
         }
+
+        public GoalResponse ChangeContributionAmount(Guid customerId, Guid goalId, Guid accountId, Guid transactionId, UpdateTransactionRequest request)
+        {
+            var goal = goalRepository.GetById(goalId)
+                ?? throw new KeyNotFoundException($"There is no goal with the id {goalId}.");
+
+            if (goal.CustomerId != customerId)
+                throw new UnauthorizedAccessException("The goal does not belong to the customer.");
+
+            var account = accountRepository.GetById(accountId)
+                ?? throw new KeyNotFoundException($"There is no account with the id {accountId}.");
+
+            if (account.CustomerId != customerId)
+                throw new UnauthorizedAccessException("The account does not belong to the customer.");
+
+            var oldAmount = account.GetContribution(goalId, transactionId).Amount;
+
+            goal.AdjustContribution(oldAmount, request.Amount);
+            account.ChangeTransactionAmount(transactionId, request.Amount);
+
+            accountRepository.SaveChanges();
+
+            return GoalResponse.From(goal);
+        }
     }
 }

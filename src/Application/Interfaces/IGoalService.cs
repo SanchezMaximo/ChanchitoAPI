@@ -11,5 +11,6 @@ namespace Application.Interfaces
         GoalResponse Cancel(Guid customerId, Guid goalId);
         GoalResponse CancelContribution(Guid customerId, Guid goalId, Guid accountId, Guid transactionId);
         IReadOnlyList<TransactionResponse> GetContributions(Guid customerId, Guid goalId);
+        GoalResponse ChangeContributionAmount(Guid customerId, Guid goalId, Guid accountId, Guid transactionId, UpdateTransactionRequest request);
     }
 }   
