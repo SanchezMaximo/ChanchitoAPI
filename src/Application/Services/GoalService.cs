@@ -77,6 +77,16 @@ namespace Application.Services
             return GoalResponse.From(goal);
         }
 
-        
+        public GoalResponse Cancel(Guid customerId, Guid goalId)
+        {
+            var goal = goalRepository.GetById(goalId);
+            if (goal is null)
+                throw new KeyNotFoundException($"There is no goal with the id {goalId}.");
+            if (goal.CustomerId != customerId)
+                throw new UnauthorizedAccessException("The goal does not belong to the customer.");
+            goal.Cancel();
+            goalRepository.SaveChanges();
+            return  GoalResponse.From(goal);
+        }
     }
 }

@@ -93,5 +93,28 @@ namespace Presentation.Controllers
             
             return Ok(goals);
         }
+
+        [HttpDelete("{id}")]
+        public ActionResult<GoalResponse> Cancel([FromRoute] Guid id)
+        {
+            try
+            {
+                var goal = goalService.Cancel(User.GetUserId(), id);
+                return Ok(goal);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            
+        }
     }
 }

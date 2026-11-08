@@ -7,5 +7,7 @@ namespace Application.Interfaces
         GoalResponse Create(Guid customerId, CreateGoalRequest request);
         GoalResponse? GetById(Guid id);
         IReadOnlyList<GoalResponse> GetByCustomerId(Guid customerId);
-        Task<GoalResponse> ContributeAsync(Guid customerId, Guid goalId, ContributeRequest request, CancellationToken cancellationToken = default);    }
-}
+        Task<GoalResponse> ContributeAsync(Guid customerId, Guid goalId, ContributeRequest request, CancellationToken cancellationToken = default);
+        GoalResponse Cancel(Guid customerId, Guid goalId);
+    }
+}   

@@ -10,6 +10,7 @@ namespace Domain.Entities
         public decimal SavedAmount { get; private set; }
         public Currency Currency { get; private set; }
         public Guid CustomerId { get; private set; }
+        public bool Cancelled { get; private set; }
         public bool IsCompleted => SavedAmount >= TargetAmount;
         public decimal Remaining => TargetAmount - SavedAmount;
 
@@ -37,13 +38,7 @@ namespace Domain.Entities
             TargetAmount = targetAmount;
             Currency = currency;
             CustomerId = customerId;
-        }
-
-        public Goal(string name, decimal targetAmount, Currency currency)
-        {
-            Name = name;
-            TargetAmount = targetAmount;
-            Currency = currency;
+            Cancelled = false;
         }
 
         private static string NormalizeName(string name)
@@ -56,14 +51,29 @@ namespace Domain.Entities
 
         public void Contribute(decimal amount)
         {
+            if (Cancelled)
+                throw new InvalidOperationException("The goal is cancelled and cannot receive contributions.");
             if (amount <= 0)
                 throw new ArgumentOutOfRangeException(nameof(amount), "The contribution must be greater than zero.");
 
             if (amount > Remaining)
                 throw new InvalidOperationException($"The contribution exceeds the remaining amount ({Remaining}).");
+
             
             SavedAmount += amount;
         }
+        
+        public void Cancel()
+        {
+            if (Cancelled)
+                throw new InvalidOperationException("The goal is already cancelled.");
+            if (SavedAmount > 0)
+                throw new InvalidOperationException("A goal with contributions cannot be cancelled.");
+                
+            
+            Cancelled = true;
+        }
+        
 
     }
 
