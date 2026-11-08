@@ -88,5 +88,39 @@ namespace Application.Services
             goalRepository.SaveChanges();
             return  GoalResponse.From(goal);
         }
+
+        public GoalResponse CancelContribution(Guid customerId, Guid goalId, Guid accountId, Guid transactionId)
+        {
+            var goal = goalRepository.GetById(goalId)
+                ?? throw new KeyNotFoundException($"There is no goal with the id {goalId}.");
+            
+            if (goal.CustomerId != customerId)
+                throw new UnauthorizedAccessException("The goal does not belong to the customer.");
+            
+            var account = accountRepository.GetById(accountId)
+                ?? throw new KeyNotFoundException($"There is no account with the id {accountId}.");
+
+            if (account.CustomerId != customerId)
+                throw new UnauthorizedAccessException("The account does not belong to the customer.");
+            
+            var contribution = account.CancelContribution(goalId, transactionId);
+            goal.CancelContribution(contribution.Amount);
+            accountRepository.SaveChanges();
+
+            return GoalResponse.From(goal);
+        }
+
+        public IReadOnlyList<TransactionResponse> GetContributions(Guid customerId, Guid goalId)
+        {
+            var goal = goalRepository.GetById(goalId)
+                ?? throw new KeyNotFoundException($"There is no goal with the id {goalId}.");
+            
+            if (goal.CustomerId != customerId)
+                throw new UnauthorizedAccessException("The goal does not belong to the customer.");
+            
+            return goalRepository.GetContributions(goalId)
+                .Select(TransactionResponse.From)
+                .ToList();
+        }
     }
 }

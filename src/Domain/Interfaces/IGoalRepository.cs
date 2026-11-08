@@ -8,6 +8,7 @@ namespace Domain.Interfaces
         Goal? GetById(Guid id);
         IReadOnlyList<Goal> GetByCustomerId(Guid customerId);
         void SaveChanges();
+        IReadOnlyList<Transaction> GetContributions(Guid guid);
     }
 
 }

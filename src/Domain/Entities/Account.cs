@@ -114,5 +114,16 @@ namespace Domain.Entities
 
             return transaction;
         }
+
+        public Transaction CancelContribution(Guid goalId, Guid transactionId)
+        {
+            var transaction = GetTransaction(transactionId);
+            
+            if (transaction.GoalId != goalId)
+                throw new InvalidOperationException($"There is no contribution with id {transactionId} for this goal.");
+            
+            return CancelTransaction(transactionId);
+        }
+
     }
 }

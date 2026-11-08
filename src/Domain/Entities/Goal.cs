@@ -74,6 +74,17 @@ namespace Domain.Entities
             Cancelled = true;
         }
         
+        public void CancelContribution(decimal amount)
+        {
+            if (amount <= 0 )
+                throw new ArgumentOutOfRangeException(nameof(amount), "The contribution cancellation amount must be greater than zero.");
+            
+            if (amount > SavedAmount)
+                throw new InvalidOperationException($"The contribution cancellation amount exceeds the saved amount ({SavedAmount}).");
+            
+            
+            SavedAmount -= amount;
+        }
 
     }
 
