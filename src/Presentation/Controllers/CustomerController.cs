@@ -44,11 +44,6 @@ namespace Presentation.Controllers
         {
             var customers = customerService.GetAll();
 
-            if (!customers.Any())
-            {
-                return NotFound("No hay clientes registrados.");
-            }
-
             return Ok(customers);
         }
 
