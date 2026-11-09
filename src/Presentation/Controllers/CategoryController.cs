@@ -32,6 +32,19 @@ namespace Presentation.Controllers
             return Ok(categoryService.GetVisibleTo(User.GetUserId()));
         }
 
+        [HttpGet("{id}")]
+        public ActionResult<CategoryResponse> GetById([FromRoute] Guid id)
+        {
+            var category = categoryService.GetById(id);
+            if (category is null)
+                return NotFound($"There is no category with id {id}.");
+
+            if (category.CustomerId is not null && category.CustomerId != User.GetUserId())
+                return Forbid();
+
+            return Ok(category);
+        }
+
         [HttpPost]
         public ActionResult<CategoryResponse> Create([FromBody] CreateCategoryRequest request)
         {
@@ -41,7 +54,7 @@ namespace Presentation.Controllers
                     ? administratorService.CreateSystemCategory(request)
                     : categoryService.CreateForCustomer(User.GetUserId(), request);
 
-                return Created($"api/Category/{category.Id}", category);
+                return CreatedAtAction(nameof(GetById), new { id = category.Id }, category);
             }
             catch (ArgumentException ex)
             {
@@ -50,6 +63,51 @@ namespace Presentation.Controllers
             catch (InvalidOperationException ex)
             {
                 return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = Roles.Customer)]
+        public ActionResult<CategoryResponse> Rename([FromRoute] Guid id, [FromBody] UpdateCategoryRequest request)
+        {
+            try
+            {
+                return Ok(categoryService.Rename(User.GetUserId(), id, request));
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = Roles.Customer)]
+        public IActionResult Delete([FromRoute] Guid id)
+        {
+            try
+            {
+                categoryService.Delete(User.GetUserId(), id);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
             }
         }
     }

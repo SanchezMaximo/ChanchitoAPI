@@ -20,19 +20,19 @@ namespace Presentation.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult<CustomerResponse> Create([FromBody] CreateCustomerRequest request) //revisar
+        public ActionResult<CustomerResponse> Create([FromBody] CreateCustomerRequest request) 
         {
             try
             {
                 var customer = customerService.Create(request);
 
-                return CreatedAtAction(nameof(GetById), new { id = customer.Id }, customer); //devuelve 201 si salio bien
+                return CreatedAtAction(nameof(GetById), new { id = customer.Id }, customer); 
             }
-            catch (ArgumentException ex) // valida que los datos sean correctos
+            catch (ArgumentException ex) 
             {
                 return BadRequest(ex.Message);
             }
-            catch (InvalidOperationException ex) // valida que no exista un cliente con ese email
+            catch (InvalidOperationException ex)
             {
                 return Conflict(ex.Message);
             }
