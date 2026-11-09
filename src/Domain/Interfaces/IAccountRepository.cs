@@ -8,7 +8,7 @@ namespace Domain.Interfaces
 
         void AddTransaction(Transaction transaction);
 
-        IReadOnlyList<Account> GetAll();
+        IReadOnlyList<Account> GetByCustomerId(Guid customerId);
 
         Account? GetById(Guid id);
 

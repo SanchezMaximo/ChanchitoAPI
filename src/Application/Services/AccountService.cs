@@ -18,14 +18,15 @@ namespace Application.Services
         
         
 
-        public AccountResponse Create(CreateAccountRequest request)
+        public AccountResponse Create(Guid customerId, CreateAccountRequest request)
         {
-            var account = new Account(request.Name, request.Balance, request.Type, request.Currency, request.CustomerId);
-            if (userRepository.GetCustomerById(request.CustomerId) is null)
-                throw new KeyNotFoundException($"There is no customer with id {request.CustomerId}.");
+            if (userRepository.GetCustomerById(customerId) is null)
+                throw new KeyNotFoundException($"There is no customer with id {customerId}.");
+
+            var account = new Account(request.Name, request.Balance, request.Type, request.Currency, customerId);
             accountRepository.Add(account);
-            accountRepository.SaveChanges();    
-            
+            accountRepository.SaveChanges();
+
             return AccountResponse.From(account);
         }
 
@@ -36,8 +37,8 @@ namespace Application.Services
             return account is null ? null : AccountResponse.From(account);
         }
 
-        public IReadOnlyList<AccountResponse> GetAll() =>
-            accountRepository.GetAll().Select(AccountResponse.From).ToList();
+        public IReadOnlyList<AccountResponse> GetByCustomerId(Guid customerId) =>
+            accountRepository.GetByCustomerId(customerId).Select(AccountResponse.From).ToList();
 
         public AccountResponse Update(Guid id, UpdateAccountRequest request)
         {

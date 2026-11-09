@@ -23,7 +23,7 @@ namespace Presentation.Controllers
         {
             try
             {
-                var createdAccount = accountService.Create(request with { CustomerId = User.GetUserId() });
+                var createdAccount = accountService.Create(User.GetUserId(), request);
                 return CreatedAtAction(nameof(GetById), new { id = createdAccount.Id }, createdAccount);
             }
             catch (ArgumentException ex)
@@ -52,16 +52,9 @@ namespace Presentation.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IReadOnlyList<AccountResponse>> GetAll()
-        {
-            var userId = User.GetUserId();
+        public ActionResult<IReadOnlyList<AccountResponse>> GetAll() =>
+            Ok(accountService.GetByCustomerId(User.GetUserId()));
 
-            var accounts = accountService.GetAll()
-                .Where(a => a.CustomerId == userId)
-                .ToList();
-
-            return Ok(accounts);
-        }
 
         [HttpPatch("{id}")]
         public ActionResult<AccountResponse> Update([FromRoute] Guid id, [FromBody] UpdateAccountRequest request)
