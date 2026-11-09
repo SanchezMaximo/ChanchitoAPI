@@ -53,6 +53,10 @@ namespace Domain.Entities
         {
             if (Cancelled)
                 throw new InvalidOperationException("The goal is cancelled and cannot receive contributions.");
+            
+            if (IsCompleted)
+                throw new InvalidOperationException("The goal has already been completed.");
+
             if (amount <= 0)
                 throw new ArgumentOutOfRangeException(nameof(amount), "The contribution must be greater than zero.");
 
@@ -67,6 +71,10 @@ namespace Domain.Entities
         {
             if (Cancelled)
                 throw new InvalidOperationException("The goal is already cancelled.");
+            
+            if (IsCompleted)
+                throw new InvalidOperationException("A completed goal cannot be cancelled.");
+
             if (SavedAmount > 0)
                 throw new InvalidOperationException("A goal with contributions cannot be cancelled.");
                 
@@ -79,6 +87,9 @@ namespace Domain.Entities
             if (amount <= 0 )
                 throw new ArgumentOutOfRangeException(nameof(amount), "The contribution cancellation amount must be greater than zero.");
             
+            if (IsCompleted)
+                throw new InvalidOperationException("The goal has already been completed.");
+            
             if (amount > SavedAmount)
                 throw new InvalidOperationException($"The contribution cancellation amount exceeds the saved amount ({SavedAmount}).");
             
@@ -90,6 +101,9 @@ namespace Domain.Entities
         {
             if (newAmount <= 0)
                 throw new ArgumentOutOfRangeException(nameof(newAmount), "The contribution must be greater than zero.");
+            
+            if (IsCompleted)
+                throw new InvalidOperationException("The goal has already been completed.");
 
             var difference = newAmount - oldAmount;
 
