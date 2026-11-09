@@ -14,7 +14,7 @@ namespace Domain.Interfaces
 
         bool SystemCategoryNameExists(string name, Guid? excludeId = null);
 
-        bool CustomerCategoryNameExists(Guid customerId, string name);
+        bool CustomerCategoryNameExists(Guid customerId, string name, Guid? excludeId = null);
 
         void Remove(Category category);
 
