@@ -23,6 +23,9 @@ namespace Application.Services
 
             if (categoryRepository.CustomerCategoryNameExists(customerId, category.Name))
                 throw new InvalidOperationException($"You already have a category named '{category.Name}'.");
+                
+            if (categoryRepository.SystemCategoryNameExists(category.Name))
+                throw new InvalidOperationException($"A system category named '{category.Name}' already exists. Please choose a different name.");
 
             categoryRepository.Add(category);
             categoryRepository.SaveChanges();
