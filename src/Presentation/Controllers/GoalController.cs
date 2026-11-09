@@ -81,6 +81,10 @@ namespace Presentation.Controllers
             {
                 return Conflict(ex.Message);
             }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
         }
     
 
