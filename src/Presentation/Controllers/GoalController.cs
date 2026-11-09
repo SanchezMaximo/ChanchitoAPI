@@ -55,8 +55,6 @@ namespace Presentation.Controllers
         public ActionResult<IReadOnlyList<GoalResponse>> GetAll()
         {
             var goals = goalService.GetByCustomerId(User.GetUserId());
-            if (goals.Count == 0)
-                return NotFound("You have no goals yet.");
             
             return Ok(goals);
         }
@@ -127,8 +125,6 @@ namespace Presentation.Controllers
             try
             {
                 var contributions = goalService.GetContributions(User.GetUserId(), id);
-                if (contributions.Count == 0)
-                    return NotFound("This goal has no contributions yet.");
                 
                 return Ok(contributions);
             }

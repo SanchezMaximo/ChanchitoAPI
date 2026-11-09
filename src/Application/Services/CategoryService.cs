@@ -32,5 +32,44 @@ namespace Application.Services
 
             return CategoryResponse.From(category);
         }
+
+        public CategoryResponse? GetById(Guid id)
+        {
+            var category = categoryRepository.GetById(id);
+            return category is null ? null : CategoryResponse.From(category);
+        }
+
+        public CategoryResponse Rename(Guid customerId, Guid id, UpdateCategoryRequest request)
+        {
+            var category = GetOwnedOrThrow(customerId, id);
+
+            category.Rename(request.Name);
+
+            if (categoryRepository.CustomerCategoryNameExists(customerId, category.Name, category.Id))
+                throw new InvalidOperationException($"You already have a category named '{category.Name}'.");
+
+            categoryRepository.SaveChanges();
+            return CategoryResponse.From(category);
+        }
+
+        public void Delete(Guid customerId, Guid id)
+        {
+            var category = GetOwnedOrThrow(customerId, id);
+
+            categoryRepository.Remove(category);
+            categoryRepository.SaveChanges();
+        }
+
+        private Category GetOwnedOrThrow(Guid customerId, Guid id)
+        {
+            var category = categoryRepository.GetById(id)
+                ?? throw new KeyNotFoundException($"There is no category with id {id}.");
+
+            if (category.CustomerId != customerId)
+                throw new UnauthorizedAccessException();
+
+            return category;
+        }
+
     }
 }
