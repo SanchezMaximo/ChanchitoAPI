@@ -18,9 +18,10 @@ namespace Infrastructure.Repositories
 
         public void AddTransaction(Transaction transaction) => context.Transactions.Add(transaction);
 
-        public IReadOnlyList<Account> GetAll() =>
+        public IReadOnlyList<Account> GetByCustomerId(Guid customerId) =>
             context.Accounts
                 .Include(a => a.Transactions)
+                .Where(a => a.CustomerId == customerId)
                 .ToList();
 
         public Account? GetById(Guid id) =>

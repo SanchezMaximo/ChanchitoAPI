@@ -4,11 +4,11 @@ namespace Application.Interfaces
 {
     public interface IAccountService
     {
-        AccountResponse Create(CreateAccountRequest request);
+        AccountResponse Create(Guid customerId,CreateAccountRequest request);
 
         AccountResponse? GetById(Guid id);
 
-       IReadOnlyList<AccountResponse> GetAll();
+        IReadOnlyList<AccountResponse> GetByCustomerId(Guid customerId);
 
         AccountResponse Update(Guid id, UpdateAccountRequest request);
 
