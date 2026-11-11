@@ -13,6 +13,7 @@ namespace Domain.Interfaces
         IReadOnlyList<Customer> GetAllCustomers();
 
         IReadOnlyList<Administrator> GetAllAdministrators();
+        User? GetById(Guid id);
 
         int CountCustomers();
 
