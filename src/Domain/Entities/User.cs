@@ -14,10 +14,10 @@ namespace Domain.Entities
         protected User(string email, string passwordHash)
         {
             if (string.IsNullOrWhiteSpace(email) || !email.Contains('@'))
-                throw new ArgumentException("El email no es válido.", nameof(email));
+                throw new ArgumentException("The email is not valid.", nameof(email));
 
             if (string.IsNullOrWhiteSpace(passwordHash))
-                throw new ArgumentException("El hash del password es obligatorio.", nameof(passwordHash));
+                throw new ArgumentException("The password hash is required.", nameof(passwordHash));
 
             Id = Guid.NewGuid();
             Email = email;
@@ -28,7 +28,7 @@ namespace Domain.Entities
         public void Suspend()
         {
             if (!IsActive)
-                throw new InvalidOperationException("El usuario ya estaba suspendido.");
+                throw new InvalidOperationException("The user is already suspended.");
 
             IsActive = false;
         }
@@ -36,7 +36,7 @@ namespace Domain.Entities
         public void Reactivate()
         {
             if (IsActive)
-                throw new InvalidOperationException("El usuario ya estaba activo.");
+                throw new InvalidOperationException("The user is already active.");
 
             IsActive = true;
         }

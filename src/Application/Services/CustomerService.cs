@@ -19,10 +19,10 @@ namespace Application.Services
         public CustomerResponse Create(CreateCustomerRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.Password) || request.Password.Length < 8)
-                throw new ArgumentException("La contraseña debe tener al menos 8 caracteres.", nameof(request));
+                throw new ArgumentException("The password must be at least 8 characters long.", nameof(request));
 
             if (userRepository.GetByEmail(request.Email) is not null)
-                throw new InvalidOperationException($"Ya existe un usuario con el email {request.Email}.");
+                throw new InvalidOperationException($"A user with the email {request.Email} already exists.");
 
             var customer = new Customer(request.Email, passwordHasher.Hash(request.Password));    
 

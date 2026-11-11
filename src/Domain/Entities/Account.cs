@@ -22,16 +22,16 @@ namespace Domain.Entities
             var normalizedName = NormalizeName(name);
 
             if (balance < 0)
-                throw new ArgumentOutOfRangeException(nameof(balance), "El saldo no puede ser negativo.");
+                throw new ArgumentOutOfRangeException(nameof(balance), "The balance cannot be negative.");
 
             if (!Enum.IsDefined(type))
-                throw new ArgumentOutOfRangeException(nameof(type), "El tipo de cuenta no es válido.");
+                throw new ArgumentOutOfRangeException(nameof(type), "The account type is not valid.");
 
             if (!Enum.IsDefined(currency))
-                throw new ArgumentOutOfRangeException(nameof(currency), "La moneda no es válida.");
+                throw new ArgumentOutOfRangeException(nameof(currency), "The currency is not valid.");
 
             if (customerId == Guid.Empty)
-                throw new ArgumentException("El cliente es obligatorio.", nameof(customerId));
+                throw new ArgumentException("The customer is required.", nameof(customerId));
 
             Id = Guid.NewGuid();
             Name = normalizedName;

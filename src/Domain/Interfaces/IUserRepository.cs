@@ -14,6 +14,7 @@ namespace Domain.Interfaces
 
         IReadOnlyList<Administrator> GetAllAdministrators();
         User? GetById(Guid id);
+        Administrator? GetAdministratorById(Guid id);
 
         int CountCustomers();
 

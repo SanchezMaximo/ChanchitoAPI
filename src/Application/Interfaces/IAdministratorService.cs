@@ -22,6 +22,10 @@ namespace Application.Interfaces
 
         CategoryResponse UpdateSystemCategory(Guid categoryId, UpdateCategoryRequest request);
 
+        AdministratorResponse SuspendAdministrator(Guid currentAdminId, Guid administratorId);
+
+        AdministratorResponse ReactivateAdministrator(Guid administratorId);
+
         void DeleteSystemCategory(Guid categoryId);
     }
 }
