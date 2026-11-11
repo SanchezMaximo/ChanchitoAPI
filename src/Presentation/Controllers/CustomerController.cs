@@ -58,7 +58,7 @@ namespace Presentation.Controllers
 
             if (customer == null)
             {
-                return NotFound($"No existe un cliente con el id {id}.");
+                return NotFound($"There is no customer with id {id}.");
             }
 
             return Ok(customer);

@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Extensions;
 
 namespace Presentation.Controllers
 {
@@ -143,6 +144,40 @@ namespace Presentation.Controllers
                 administratorService.DeleteSystemCategory(id);
 
                 return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPatch("{id}/suspend")]
+        public ActionResult<AdministratorResponse> SuspendAdministrator([FromRoute] Guid id)
+        {
+            try
+            {
+                return Ok(administratorService.SuspendAdministrator(User.GetUserId(), id));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPatch("{id}/reactivate")]
+        public ActionResult<AdministratorResponse> ReactivateAdministrator([FromRoute] Guid id)
+        {
+            try
+            {
+                return Ok(administratorService.ReactivateAdministrator(id));
             }
             catch (KeyNotFoundException ex)
             {

@@ -126,5 +126,38 @@ namespace Application.Services
 
             return category;
         }
+        private Administrator GetAdministratorOrThrow(Guid administratorId)
+         {
+            var administrator = userRepository.GetAdministratorById(administratorId);
+
+            if (administrator is null)
+                throw new KeyNotFoundException($"There is no administrator with id {administratorId}.");
+
+            return administrator;
+        }
+
+        public AdministratorResponse SuspendAdministrator(Guid currentAdminId, Guid administratorId)
+        {
+            if (currentAdminId == administratorId)
+                throw new InvalidOperationException("An administrator cannot suspend themselves.");
+
+            var administrator = GetAdministratorOrThrow(administratorId);
+
+            administrator.Suspend();
+            userRepository.SaveChanges();
+
+            return AdministratorResponse.From(administrator);
+        }
+
+        public AdministratorResponse ReactivateAdministrator(Guid administratorId)
+        {
+            var administrator = GetAdministratorOrThrow(administratorId);
+
+            administrator.Reactivate();
+            userRepository.SaveChanges();
+
+            return AdministratorResponse.From(administrator);
+        }
+
     }
 }

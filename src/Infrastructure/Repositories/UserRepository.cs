@@ -34,6 +34,9 @@ namespace Infrastructure.Repositories
 
         public User? GetById(Guid id) =>
             context.Users.FirstOrDefault(u => u.Id == id);
+
+        public Administrator? GetAdministratorById(Guid id) =>
+            context.Administrators.FirstOrDefault(a => a.Id == id);
             
         public int CountCustomers() => context.Customers.Count();
 
