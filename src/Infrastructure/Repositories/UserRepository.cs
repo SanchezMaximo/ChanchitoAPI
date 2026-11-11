@@ -32,6 +32,9 @@ namespace Infrastructure.Repositories
         public IReadOnlyList<Administrator> GetAllAdministrators() =>
             context.Administrators.ToList();
 
+        public User? GetById(Guid id) =>
+            context.Users.FirstOrDefault(u => u.Id == id);
+            
         public int CountCustomers() => context.Customers.Count();
 
         public int CountActiveCustomers() => context.Customers.Count(c => c.IsActive);

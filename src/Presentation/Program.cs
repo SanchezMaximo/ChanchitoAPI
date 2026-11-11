@@ -78,9 +78,16 @@ builder.Services
         {
             OnTokenValidated = context =>
             {
-                var email = context.Principal?.FindFirst(ClaimTypes.Email)?.Value;
+                var idClaim = context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (!Guid.TryParse(idClaim, out var userId))
+                {
+                    context.Fail("The token does not contain a valid user id.");
+                    return Task.CompletedTask;
+                }
+
                 var userRepository = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
-                var user = email is null ? null : userRepository.GetByEmail(email);
+                var user = userRepository.GetById(userId);
 
                 if (user is null || !user.IsActive)
                     context.Fail("The user does not exist or is suspended.");
